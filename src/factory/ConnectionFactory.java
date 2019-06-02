@@ -7,7 +7,7 @@ import java.sql.SQLException;
 public class FactoryConnection {
 	private static final String URL = "jdbc:mysql://localhost:3306/supermarket?useTimezone=true&serverTimezone=UTC";
 	private static final String USER = "root";
-	private static final String PASSWORD = "snippetcode";
+	private static final String PASSWORD = "yourpassword";
 
 	public static Connection connect() throws SQLException {
 		Connection connection = DriverManager.getConnection(URL, USER, PASSWORD);
