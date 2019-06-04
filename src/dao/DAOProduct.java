@@ -9,7 +9,7 @@ import java.util.Scanner;
 
 import domain.Product;
 import domain.ProductPrice;
-import factory.FactoryConnection;
+import factory.ConnectionFactory;
 import interfaces.Protection;
 
 public class DAOProduct extends ProductPrice implements Protection {
@@ -30,35 +30,6 @@ public class DAOProduct extends ProductPrice implements Protection {
 			int id = sc.nextInt();
 			sc.nextLine();
 
-			try {
-				Connection c = FactoryConnection.connect();
-				PreparedStatement statement = c.prepareStatement("SELECT id FROM product WHERE id = ?");
-				statement.setInt(1, id);
-
-				ResultSet rs = statement.executeQuery();
-				rs.first();
-
-				int result = 0;
-
-				do {
-					System.out.println("Product with that ID already exists!");
-					System.out.println("Please enter with a diferent ID: ");
-					id = sc.nextInt();
-					sc.nextLine();
-
-					statement.setInt(1, id);
-
-					rs = statement.executeQuery();
-
-					if (rs.next()) {
-						result = rs.getInt("id");
-					}
-
-				} while (result == id);
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
-
 			System.out.print("Product name: ");
 			String name = sc.nextLine();
 
@@ -76,7 +47,7 @@ public class DAOProduct extends ProductPrice implements Protection {
 			int unity = sc.nextInt();
 
 			try {
-				Connection connection = FactoryConnection.connect();
+				Connection connection = ConnectionFactory.connect();
 				PreparedStatement ps = connection.prepareStatement(sql);
 				ps.setInt(1, id);
 				ps.setString(2, name);
@@ -90,6 +61,9 @@ public class DAOProduct extends ProductPrice implements Protection {
 				System.out.println("PRODUCT INSERTED SUCCESSFULLY!");
 				System.out.println("Would you like to register another product? [Y/N]");
 				str = sc.next();
+				
+				connection.close();
+				ps.close();
 			} catch (SQLException e) {
 				System.out.println("PRODUCT WAS NOT INSERTED SUCCESSFULLY!");
 				e.printStackTrace();
@@ -101,7 +75,7 @@ public class DAOProduct extends ProductPrice implements Protection {
 		String sql = "SELECT id, name, barcode, category, price, unity FROM product ORDER BY name ASC";
 
 		try {
-			Connection connection = FactoryConnection.connect();
+			Connection connection = ConnectionFactory.connect();
 			PreparedStatement ps = connection.prepareStatement(sql);
 
 			ResultSet rs = ps.executeQuery();
@@ -118,7 +92,10 @@ public class DAOProduct extends ProductPrice implements Protection {
 
 				productList.add(p);
 			}
-
+			
+			connection.close();
+			ps.close();
+			rs.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -132,7 +109,7 @@ public class DAOProduct extends ProductPrice implements Protection {
 		int id = sc.nextInt();
 
 		try {
-			Connection connection = FactoryConnection.connect();
+			Connection connection = ConnectionFactory.connect();
 			PreparedStatement ps = connection.prepareStatement(sql);
 			ps.setInt(1, id);
 
@@ -194,6 +171,10 @@ public class DAOProduct extends ProductPrice implements Protection {
 
 				} while (result != id);
 			}
+			
+			connection.close();
+			ps.close();
+			rs.close();
 		} catch (SQLException e) {
 			System.out.println("SEARCH UNAVAILABLE. NO PRODUCT REGISTERED!");
 			e.printStackTrace();
@@ -207,7 +188,7 @@ public class DAOProduct extends ProductPrice implements Protection {
 		String sql = "SELECT id, name, barcode, category, price, unity FROM product ORDER BY name ASC";
 
 		try {
-			Connection connection = FactoryConnection.connect();
+			Connection connection = ConnectionFactory.connect();
 			PreparedStatement ps = connection.prepareStatement(sql);
 
 			ResultSet rs = ps.executeQuery();
@@ -236,6 +217,9 @@ public class DAOProduct extends ProductPrice implements Protection {
 				System.out.println("Empty Product Stock.");
 			}
 
+			connection.close();
+			ps.close();
+			rs.close();
 		} catch (SQLException e) {
 			System.out.println("COULDN'T DISPLAY PRODUCTS!");
 			e.printStackTrace();
@@ -283,7 +267,7 @@ public class DAOProduct extends ProductPrice implements Protection {
 			int unity = sc.nextInt();
 
 			try {
-				Connection connection = FactoryConnection.connect();
+				Connection connection = ConnectionFactory.connect();
 				PreparedStatement ps = connection.prepareStatement(sql);
 				ps.setInt(1, id);
 				ps.setString(2, name);
@@ -295,6 +279,9 @@ public class DAOProduct extends ProductPrice implements Protection {
 
 				ps.executeUpdate();
 				System.out.println("NEW PRODUCT UPDATED SUCCESSFULLY!");
+				
+				connection.close();
+				ps.close();
 			} catch (SQLException e) {
 				System.out.println("COULDN'T UPDATE NEW PRODUCT!");
 				e.printStackTrace();
@@ -315,7 +302,7 @@ public class DAOProduct extends ProductPrice implements Protection {
 			int op = sc.nextInt();
 
 			try {
-				Connection connection = FactoryConnection.connect();
+				Connection connection = ConnectionFactory.connect();
 				PreparedStatement ps = null;
 
 				if (op == 1) {
@@ -340,7 +327,9 @@ public class DAOProduct extends ProductPrice implements Protection {
 
 					System.out.println("PRODUCT REMOVED SUCCESSFULLY!");
 				}
-
+				
+				connection.close();
+				ps.close();
 			} catch (SQLException e) {
 				System.out.println("ERROR WHILE TRYING TO REMOVE PRODUCT.");
 				e.printStackTrace();
