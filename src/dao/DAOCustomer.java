@@ -9,7 +9,7 @@ import java.util.Scanner;
 
 import domain.Customer;
 import domain.Product;
-import factory.FactoryConnection;
+import factory.ConnectionFactory;
 import interfaces.Protection;
 
 public class DAOCustomer extends Product implements Protection {
@@ -28,35 +28,6 @@ public class DAOCustomer extends Product implements Protection {
 			int id = sc.nextInt();
 			sc.nextLine();
 
-			try {
-				Connection c = FactoryConnection.connect();
-				PreparedStatement statement = c.prepareStatement("SELECT id FROM customer WHERE id = ?");
-				statement.setInt(1, id);
-
-				ResultSet rs = statement.executeQuery();
-				rs.first();
-
-				int result = 0;
-
-				do {
-					System.out.println("Customer with that ID already exists!");
-					System.out.println("Please enter with a diferent ID: ");
-					id = sc.nextInt();
-					sc.nextLine();
-
-					statement.setInt(1, id);
-
-					rs = statement.executeQuery();
-
-					if (rs.next()) {
-						result = rs.getInt("id");
-					}
-
-				} while (result == id);
-			} catch (SQLException ex) {
-				ex.printStackTrace();
-			}
-
 			System.out.print("Customer Name: ");
 			String name = sc.nextLine();
 
@@ -71,7 +42,7 @@ public class DAOCustomer extends Product implements Protection {
 			String phone = sc.nextLine();
 
 			try {
-				Connection connection = FactoryConnection.connect();
+				Connection connection = ConnectionFactory.connect();
 				PreparedStatement ps = connection.prepareStatement(sql);
 
 				ps.setInt(1, id);
@@ -87,6 +58,9 @@ public class DAOCustomer extends Product implements Protection {
 
 				System.out.println("Would you like to register another customer? [Y/N]");
 				str = sc.next();
+
+				connection.close();
+				ps.close();
 			} catch (SQLException e) {
 				System.out.println("Customer was not registered successfully.");
 				e.printStackTrace();
@@ -98,7 +72,7 @@ public class DAOCustomer extends Product implements Protection {
 		String sql = "SELECT id, name, cpf, email, phone FROM customer ORDER BY name ASC";
 
 		try {
-			Connection connection = FactoryConnection.connect();
+			Connection connection = ConnectionFactory.connect();
 			PreparedStatement ps = connection.prepareStatement(sql);
 
 			ResultSet rs = ps.executeQuery();
@@ -115,6 +89,9 @@ public class DAOCustomer extends Product implements Protection {
 				customerList.add(c);
 			}
 
+			connection.close();
+			ps.close();
+			rs.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -128,7 +105,7 @@ public class DAOCustomer extends Product implements Protection {
 		int id = sc.nextInt();
 
 		try {
-			Connection connection = FactoryConnection.connect();
+			Connection connection = ConnectionFactory.connect();
 			PreparedStatement ps = connection.prepareStatement(sql);
 			ps.setInt(1, id);
 
@@ -187,6 +164,9 @@ public class DAOCustomer extends Product implements Protection {
 				} while (result != id);
 			}
 
+			connection.close();
+			ps.close();
+			rs.close();
 		} catch (SQLException e) {
 			System.out.println("Research unavailable. No customer registered!");
 			e.printStackTrace();
@@ -200,7 +180,7 @@ public class DAOCustomer extends Product implements Protection {
 		String sql = "SELECT id, name, cpf, email, phone FROM customer ORDER BY name ASC";
 
 		try {
-			Connection connection = FactoryConnection.connect();
+			Connection connection = ConnectionFactory.connect();
 			PreparedStatement ps = connection.prepareStatement(sql);
 
 			ResultSet rs = ps.executeQuery();
@@ -226,6 +206,10 @@ public class DAOCustomer extends Product implements Protection {
 			if (d.isEmpty()) {
 				System.out.println("Empty Product Stock.");
 			}
+
+			connection.close();
+			ps.close();
+			rs.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -267,7 +251,7 @@ public class DAOCustomer extends Product implements Protection {
 			String phone = sc.nextLine();
 
 			try {
-				Connection connection = FactoryConnection.connect();
+				Connection connection = ConnectionFactory.connect();
 				PreparedStatement ps = connection.prepareStatement(sql);
 				ps.setInt(1, id);
 				ps.setString(2, name);
@@ -278,6 +262,9 @@ public class DAOCustomer extends Product implements Protection {
 
 				ps.executeUpdate();
 				System.out.println("New customer updated successfully!");
+
+				connection.close();
+				ps.close();
 			} catch (SQLException e) {
 				System.out.println("Couldn't update the new customer!");
 				e.printStackTrace();
@@ -298,7 +285,7 @@ public class DAOCustomer extends Product implements Protection {
 			int op = sc.nextInt();
 
 			try {
-				Connection connection = FactoryConnection.connect();
+				Connection connection = ConnectionFactory.connect();
 				PreparedStatement ps = null;
 
 				if (op == 1) {
@@ -322,7 +309,8 @@ public class DAOCustomer extends Product implements Protection {
 					ps.executeUpdate();
 					System.out.println("Customer removed successfully!");
 				}
-
+				connection.close();
+				ps.close();
 			} catch (SQLException e) {
 				System.out.println("Error while trying to remove customer.");
 				e.printStackTrace();
