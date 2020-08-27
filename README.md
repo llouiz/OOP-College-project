@@ -1,2 +1,2 @@
-# OOP-College-project
+# Object-oriented programming college project
 CRUD
